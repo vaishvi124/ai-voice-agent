@@ -1,0 +1,8 @@
+ggml-*.bin
+
+*.wav
+*.mp3
+
+.DS_Store
+
+.env
