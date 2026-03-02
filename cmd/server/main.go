@@ -34,30 +34,31 @@ func main() {
 	writer.Write([]string{"File", "Transcription"}) // header
 
 	// Loop through all .wav files (case-insensitive)
-found := false
-for _, f := range files {
-    if f.IsDir() {
-        continue // skip folders
-    }
+	found := false
+	for _, f := range files {
+		if f.IsDir() {
+			continue // skip folders
+		}
 
-    ext := strings.ToLower(filepath.Ext(f.Name()))
-    if ext != ".wav" {
-        continue // skip non-wav files like .DS_Store
-    }
+		ext := strings.ToLower(filepath.Ext(f.Name()))
+		if ext != ".wav" {
+			continue // skip non-wav files like .DS_Store
+		}
 
-    found = true
-audioPath := "audio/audio.wav"
-text, err := stt.Transcribe(audioPath)
-    if err != nil {
-        continue
-    }
-    fmt.Println(f.Name(), "->", text)
-    writer.Write([]string{f.Name(), text})
+		found = true
+		audioPath := filepath.Join(audioFolder, f.Name())
+		text, err := stt.Transcribe(audioPath)
+		if err != nil {
+			continue
+		}
+		fmt.Println(f.Name(), "->", text)
+		writer.Write([]string{f.Name(), text})
+	}
+
+	if !found {
+		fmt.Println("No .wav files found in folder:", audioFolder)
+	} else {
+		fmt.Println("All transcriptions complete! Results saved to results.csv")
+	}
 }
 
-if !found {
-    fmt.Println("No .wav files found in folder:", audioFolder)
-} else {
-    fmt.Println("All transcriptions complete! Results saved to results.csv")
-}
-}
