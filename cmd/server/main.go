@@ -49,7 +49,6 @@ for _, f := range files {
 audioPath := "audio/audio.wav"
 text, err := stt.Transcribe(audioPath)
     if err != nil {
-        fmt.Println("Error transcribing", f.Name(), ":", err)
         continue
     }
     fmt.Println(f.Name(), "->", text)
