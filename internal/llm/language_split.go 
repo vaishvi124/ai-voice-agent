@@ -1,0 +1,19 @@
+package llm
+
+type SplitResponse struct {
+	Gujarati string
+	English  string
+	Hindi    string
+}
+
+func SplitLanguages(text string) (*SplitResponse, error) {
+
+	// Temporary placeholder until LLM API is added
+	result := &SplitResponse{
+		Gujarati: "",
+		English:  text,
+		Hindi:    "",
+	}
+
+	return result, nil
+}

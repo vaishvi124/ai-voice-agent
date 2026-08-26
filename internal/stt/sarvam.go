@@ -34,6 +34,7 @@ func Transcribe(audioPath string) (string, error) {
 
 	// Sarvam may require model/language fields (safe defaults)
 	writer.WriteField("model", "saarika:v2.5")
+writer.WriteField("language_code", "unknown")
 	writer.Close()
 
 	req, err := http.NewRequest(

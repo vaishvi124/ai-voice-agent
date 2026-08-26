@@ -1,64 +1,64 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"os"
-	"path/filepath"
-	"strings"
 
+	"ai-voice-agent/internal/audio"
+	"ai-voice-agent/internal/llm"
 	"ai-voice-agent/internal/stt"
 )
 
 func main() {
-	fmt.Println("Starting STT test...")
+	fmt.Println("🚀 Starting Voice Agent...")
 
-	audioFolder := "audio"
+	audioPath := "audio/mic.wav"
 
-	files, err := ioutil.ReadDir(audioFolder)
+	// 1️⃣ Record audio from microphone
+	err := audio.RecordAudio(audioPath)
 	if err != nil {
-		log.Fatal("Error reading folder:", err)
+		fmt.Println("❌ Recording error:", err)
+		return
 	}
 
-	// Create CSV file to save results
-	csvFile, err := os.Create("results.csv")
+	fmt.Println("✅ Recording saved:", audioPath)
+
+	// 2️⃣ Transcribe audio using Sarvam
+	text, err := stt.Transcribe(audioPath)
 	if err != nil {
-		log.Fatal("Error creating CSV file:", err)
-	}
-	defer csvFile.Close()
-
-	writer := csv.NewWriter(csvFile)
-	defer writer.Flush()
-	writer.Write([]string{"File", "Transcription"}) // header
-
-	// Loop through all .wav files (case-insensitive)
-	found := false
-	for _, f := range files {
-		if f.IsDir() {
-			continue // skip folders
-		}
-
-		ext := strings.ToLower(filepath.Ext(f.Name()))
-		if ext != ".wav" {
-			continue // skip non-wav files like .DS_Store
-		}
-
-		found = true
-		audioPath := filepath.Join(audioFolder, f.Name())
-		text, err := stt.Transcribe(audioPath)
-		if err != nil {
-			continue
-		}
-		fmt.Println(f.Name(), "->", text)
-		writer.Write([]string{f.Name(), text})
+		fmt.Println("❌ Error transcribing:", err)
+		return
 	}
 
-	if !found {
-		fmt.Println("No .wav files found in folder:", audioFolder)
-	} else {
-		fmt.Println("All transcriptions complete! Results saved to results.csv")
+	fmt.Println("\n📝 Full Transcription:", text)
+
+	// 3️⃣ Detect source language
+	sourceLanguage := "en-IN"
+
+	for _, r := range text {
+
+		// Gujarati Unicode range
+		if r >= '\u0A80' && r <= '\u0AFF' {
+			sourceLanguage = "gu-IN"
+			break
+		}
+
+		// Hindi / Devanagari Unicode range
+		if r >= '\u0900' && r <= '\u097F' {
+			sourceLanguage = "hi-IN"
+			break
+		}
 	}
+
+	fmt.Println("🔤 Detected language:", sourceLanguage)
+
+	// 4️⃣ Translate to English using Sarvam
+	englishText, err := llm.TranslateToEnglish(text, sourceLanguage)
+	if err != nil {
+		fmt.Println("❌ Translation error:", err)
+		return
+	}
+
+	fmt.Println("🌍 English:", englishText)
+
+	fmt.Println("\n✅ Voice processing complete!")
 }
-
