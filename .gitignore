@@ -1,8 +1,12 @@
-ggml-*.bin
+# Binaries
+/bin/
+*.exe
 
-*.wav
-*.mp3
+# Audio outputs
+audio/*.wav
+!audio/.gitkeep
 
+# OS / Editor files
 .DS_Store
-
-.env
+.idea/
+.vscode/
